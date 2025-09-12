@@ -1,0 +1,8 @@
+RewriteEngine on
+
+RewriteRule ^api/(.*)$ /index.php?path=$1 [L]
+RewriteRule ^web(.*)$ /static$1 [L]
+RewriteCond %{REQUEST_URI} !^/static
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/index.php
+RewriteRule ^(.*)$ /static$1 [L]

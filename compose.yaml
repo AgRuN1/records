@@ -1,0 +1,25 @@
+services:
+  web:
+    env_file: ".env"
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      default:
+        aliases:
+          - web
+  mysql:
+    image: mysql:8.0
+    env_file: ".env"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      default:
+        aliases:
+          - mysql
