@@ -4,13 +4,15 @@ namespace controllers;
 use errors\HttpError404;
 use models\UserModel;
 use repositories\UserRepository;
+use services\AuthService;
 
 class UserController extends BaseController
 {
     public string $name = 'users';
 
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private AuthService $authService
     )
     {}
 
@@ -58,7 +60,7 @@ class UserController extends BaseController
         ];
     }
 
-    public function check($params)
+    public function login($params)
     {
         $login = $params[0] ?? null;
         $password = $params[1] ?? null;
@@ -72,14 +74,21 @@ class UserController extends BaseController
                 'error' => 'invalid login'
             ];
         }
-        $user = new UserModel($login, $password, true);
-        $result = $this->userRepository->check($user);
-        if ($result) {
-            session_start();
-            $_SESSION['login'] = $user->getLogin();
+        $success = false;
+        if ($this->authService->login($login, $password)) {
+            $_SESSION['login'] = $login;
+            $success = true;
         }
         return [
-            'result' => $result
+            'result' => $success
+        ];
+    }
+
+    public function logout($params)
+    {
+        $this->authService->logout();
+        return [
+            'result' => true
         ];
     }
 }
