@@ -45,13 +45,13 @@ class UserController extends BaseController
                 'error' => 'invalid login'
             ];
         }
-        $user = new UserModel($login, $password, true);
-        $current_user = $this->userRepository->get_by_login($user->login);
-        if ($current_user) {
+        $user_id = $this->userRepository->get_id_by_login($login);
+        if ($user_id !== null) {
             return [
                 'error' => 'user already exists'
             ];
         }
+        $user = new UserModel($login, $password);
         $this->userRepository->create($user);
         return [
             'user' => $user->toArray()
@@ -75,7 +75,8 @@ class UserController extends BaseController
         $user = new UserModel($login, $password, true);
         $result = $this->userRepository->check($user);
         if ($result) {
-            setcookie('login', $login, time()+3600, "/api/*");
+            session_start();
+            $_SESSION['login'] = $user->getLogin();
         }
         return [
             'result' => $result

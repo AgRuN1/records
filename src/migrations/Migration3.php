@@ -3,14 +3,15 @@
 namespace migrations;
 
 use models\UserModel;
+use services\CryptService;
 
 class Migration3 extends BaseMigration
 {
     public function up()
     {
-        $user = new UserModel('test', 'test', true);
+        $cryptService = new CryptService();
         $sql = "INSERT INTO `data`.`users`(login, password) VALUES(?, ?)";
-        $this->execute($sql, [$user->login, $user->password]);
+        $this->execute($sql, [$cryptService->encrypt('test'), $cryptService->encrypt('test')]);
     }
 
     public function down()
