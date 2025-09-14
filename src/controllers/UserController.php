@@ -51,10 +51,10 @@ class UserController
     {
         $login = $params[0] ?? null;
         $password = $params[1] ?? null;
-        if (!$this->validate_login($login, 40)) {
+        if (!$this->validate_login($login)) {
             return (new HttpError422('invalid login'))->show_message();
         }
-        if (!$this->validate_password($password, 40)) {
+        if (!$this->validate_password($password)) {
             return (new HttpError422('invalid password'))->show_message();
         }
         $user_id = $this->userRepository->get_id_by_login($login);
