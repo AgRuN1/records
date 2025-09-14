@@ -2,11 +2,13 @@
 
 namespace controllers;
 use errors\HttpError404;
+use errors\HttpError422;
 use models\UserModel;
 use repositories\UserRepository;
 use services\AuthService;
+use vendor\Response;
 
-class UserController extends BaseController
+class UserController
 {
     public string $name = 'users';
 
@@ -16,79 +18,76 @@ class UserController extends BaseController
     )
     {}
 
+    private function validate_login(string $login): bool
+    {
+        if (!preg_match('/^[a-z]{4,40}$/', $login)) {
+            return false;
+        }
+        return true;
+    }
+
+    private function validate_password(string $password): bool
+    {
+        if (!preg_match('/^[a-zA-Z0-9]{4,40}$/', $password)) {
+            return false;
+        }
+        return true;
+    }
+
     public function get($params)
     {
         $id = $params[0] ?? null;
-        if (!$this->validate_int($id)) {
-            return [
-                'error' => 'invalid id'
-            ];
+        if (!is_numeric($id)) {
+            return (new HttpError422('invalid id'))->show_message();
         }
         $user = $this->userRepository->get($id);
         if (!$user) {
             return (new HttpError404())->show_message();
         }
-        return [
-            'user' => $user->toArray()
-        ];
+        return new Response($user->toArray());
     }
 
     public function add($params)
     {
         $login = $params[0] ?? null;
         $password = $params[1] ?? null;
-        if (!$this->validate_string($login, 40)) {
-            return [
-                'error' => 'invalid login'
-            ];
+        if (!$this->validate_login($login, 40)) {
+            return (new HttpError422('invalid login'))->show_message();
         }
-        if (!$this->validate_string($password, 40)) {
-            return [
-                'error' => 'invalid login'
-            ];
+        if (!$this->validate_password($password, 40)) {
+            return (new HttpError422('invalid password'))->show_message();
         }
         $user_id = $this->userRepository->get_id_by_login($login);
         if ($user_id !== null) {
-            return [
-                'error' => 'user already exists'
-            ];
+            return (new HttpError422('user already exists'))->show_message();
         }
         $user = new UserModel($login, $password);
         $this->userRepository->create($user);
-        return [
-            'user' => $user->toArray()
-        ];
+        if ($this->authService->login($login, $password)) {
+            return new Response($user->toArray(), true);
+        }
+        return new Response($user->toArray(), false);
     }
 
     public function login($params)
     {
         $login = $params[0] ?? null;
         $password = $params[1] ?? null;
-        if (!$this->validate_string($login, 40)) {
-            return [
-                'error' => 'invalid login'
-            ];
+        if (!$this->validate_login($login)) {
+            return (new HttpError422('invalid login'))->show_message();
         }
-        if (!$this->validate_string($password, 40)) {
-            return [
-                'error' => 'invalid login'
-            ];
+        if (!$this->validate_password($password)) {
+            return (new HttpError422('invalid password'))->show_message();
         }
-        $success = false;
         if ($this->authService->login($login, $password)) {
-            $_SESSION['login'] = $login;
-            $success = true;
+            return new Response(null, true, 200);
         }
-        return [
-            'result' => $success
-        ];
+        return new Response(null, false, 422);
     }
 
     public function logout($params)
     {
         $this->authService->logout();
-        return [
-            'result' => true
-        ];
+        return new Response(null, true);
     }
 }

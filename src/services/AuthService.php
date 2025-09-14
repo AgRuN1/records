@@ -15,7 +15,11 @@ class AuthService
     }
 
     public function login(string $login, string $password) {
-        return $this->userRepository->check(new UserModel($login, $password));
+        if ($this->userRepository->check(new UserModel($login, $password))) {
+            $_SESSION['login'] = $login;
+            return true;
+        }
+        return false;
     }
 
     public function auth(string $login) {

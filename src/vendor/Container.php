@@ -1,5 +1,7 @@
 <?php
 
+namespace vendor;
+
 use controllers\RecordController;
 use controllers\UserController;
 use database\MysqliSession;
@@ -36,7 +38,7 @@ class Container
         ];
     }
 
-public function has(string $id): bool
+    public function has(string $id): bool
     {
         return isset($this->objects[$id]);
     }
