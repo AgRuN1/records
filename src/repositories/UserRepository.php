@@ -16,10 +16,10 @@ class UserRepository extends BaseRepository
         parent::__construct($session);
     }
 
-    public function get($id): ?UserModel
+    public function get(string $login): ?UserModel
     {
-        $sql = "SELECT `login`,`password` FROM `users` WHERE `id`=?";
-        $result = $this->db->query($sql, [$id]);
+        $sql = "SELECT `login`,`password` FROM `users` WHERE `login`=?";
+        $result = $this->db->query($sql, [$this->cryptService->encrypt($login)]);
         if ($result->num_rows > 0) {
             $user = $this->parseData(
                 $result,

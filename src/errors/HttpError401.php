@@ -8,6 +8,6 @@ class HttpError401 extends HttpError
 {
     public function show_message()
     {
-        return new Response(null, false, 401, 'Not logged in');
+        return new Response(null, false, 401, 'Ошибка авторизации');
     }
 }

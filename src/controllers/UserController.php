@@ -36,13 +36,13 @@ class UserController
 
     public function get($params)
     {
-        $id = $params[0] ?? null;
-        if (!is_numeric($id)) {
-            return (new HttpError422('invalid id'))->show_message();
+        $login = $params[0] ?? null;
+        if (!$this->validate_login($login)) {
+            return (new HttpError422('Некорректный логин'))->show_message();
         }
-        $user = $this->userRepository->get($id);
+        $user = $this->userRepository->get($login);
         if (!$user) {
-            return (new HttpError404())->show_message();
+            return (new HttpError422('Логин не найден'))->show_message();
         }
         return new Response($user->toArray());
     }
@@ -52,14 +52,14 @@ class UserController
         $login = $params[0] ?? null;
         $password = $params[1] ?? null;
         if (!$this->validate_login($login)) {
-            return (new HttpError422('invalid login'))->show_message();
+            return (new HttpError422('Некорректный логин'))->show_message();
         }
         if (!$this->validate_password($password)) {
-            return (new HttpError422('invalid password'))->show_message();
+            return (new HttpError422('Некорректный пароль'))->show_message();
         }
         $user_id = $this->userRepository->get_id_by_login($login);
         if ($user_id !== null) {
-            return (new HttpError422('user already exists'))->show_message();
+            return (new HttpError422('Логин уже занят'))->show_message();
         }
         $user = new UserModel($login, $password);
         $this->userRepository->create($user);
@@ -74,10 +74,10 @@ class UserController
         $login = $params[0] ?? null;
         $password = $params[1] ?? null;
         if (!$this->validate_login($login)) {
-            return (new HttpError422('invalid login'))->show_message();
+            return (new HttpError422('Некорректный логин'))->show_message();
         }
         if (!$this->validate_password($password)) {
-            return (new HttpError422('invalid password'))->show_message();
+            return (new HttpError422('Некорректный пароль'))->show_message();
         }
         if ($this->authService->login($login, $password)) {
             return new Response(null, true, 200);

@@ -21,15 +21,15 @@ class RecordController
 
     public function all($params)
     {
-        $login = $_SESSION['login'] ?? null;
-        if ($login === null || !$this->authService->auth($login)) {
+        $login = $this->authService->auth();
+        if ($login === null) {
             return (new HttpError401())->show_message();
         }
         $page = intval($params[0] ?? 1);
         $pageSize = intval($params[1] ?? 1);
 
         if ($page <= 0 || $pageSize <= 0) {
-            return (new HttpError422('invalid pagination'))->show_message();
+            return (new HttpError422('Некорректная пагинация'))->show_message();
         }
         $author_id = $this->userRepository->get_id_by_login($login);
         $data = $this->recordRepository->all($author_id, $page, $pageSize);
@@ -37,6 +37,8 @@ class RecordController
         foreach ($data as $record) {
             $records[] = $record->toArray();
         }
-        return new Response($records);
+        $count = $this->recordRepository->count($author_id);
+        $pages = ceil($count / $pageSize);
+        return new Response(['records' => $records, 'pages' => $pages]);
     }
 }
