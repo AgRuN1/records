@@ -27,6 +27,11 @@ class Response
         $this->success = $success;
     }
 
+    public function setHTTPStatus()
+    {
+        http_response_code($this->status);
+    }
+
     public function toArray(): array
     {
         return [

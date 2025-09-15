@@ -7,7 +7,6 @@ use controllers\UserController;
 use vendor\Container;
 use vendor\Router;
 
-date_default_timezone_set(getenv('TIMEZONE'));
 header('Content-type: application/json');
 
 (function()

@@ -25,7 +25,7 @@
                 <nav>
                     <ul class="pagination">
                         <li class="page-item" v-if="current_page > 1">
-                            <a class="page-link" href="#" aria-label="Previous" @click="pagination(current_page - 1)">
+                            <a class="page-link" href="#" @click="pagination(current_page - 1)">
                                 <span aria-hidden="true">&laquo;</span>
                                 <span class="sr-only">Previous</span>
                             </a>
@@ -34,7 +34,7 @@
                             <a class="page-link" href="#" @click="pagination(i)">{{ i }}</a>
                         </li>
                         <li class="page-item" v-if="pages - current_page > 0">
-                            <a class="page-link" href="#" aria-label="Next" @click="pagination(current_page + 1)">
+                            <a class="page-link" href="#" @click="pagination(current_page + 1)">
                                 <span aria-hidden="true">&raquo;</span>
                                 <span class="sr-only">Next</span>
                             </a>

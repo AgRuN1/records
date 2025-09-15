@@ -40,7 +40,9 @@ class Router
     {
         $method = $this->method;
         $arguments = $this->arguments;
+        /* @var Response $response */
         $response = $this->controller->$method($arguments);
+        $response->setHTTPStatus();
         print($response->toJson());
     }
 }
